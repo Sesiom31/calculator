@@ -1,0 +1,96 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+  height: 100vh;
+  padding: 2rem;
+  background-color: #454546;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  width: 18rem;
+  height: 100%;
+  border: 3px solid #fff;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background-color: #272727;
+}
+
+.container-display {
+  width: 100%;
+  margin-top: 2rem;
+}
+
+.container-display input {
+  width: 100%;
+  height: 3rem;
+  border-radius: 0.3rem;
+  direction: rtl;
+  font-size: 1.2rem;
+  padding: 0.2rem 0.3rem;
+  background-color: #272727;
+  border: none;
+  color: #fff;
+}
+
+.container-display input:focus {
+  outline: none;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.container-display div {
+  position: relative;
+}
+
+.container-display div::before {
+  content: " ";
+  position: absolute;
+  right: 1px;
+  top: 50%;
+  width: 2px;
+  height: 30px;
+  translate: 0 -50%;
+  background-color: #fff;
+  animation: blink 0.8s infinite;
+}
+
+.group-btn {
+  width: 95%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  justify-items: center;
+  align-items: center;
+  margin: auto;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.btn {
+  width: 3.4rem;
+  height: 3.4rem;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  font-size: 1.15rem;
+  background-color: #666666;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn:hover {
+  background-color: #ff9800;
+}
