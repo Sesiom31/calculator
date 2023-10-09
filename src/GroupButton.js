@@ -1,8 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Button from "./Button";
 
 let counter = 0;
-function GroupButton({ operacion, setOperacion, solve, setSolve }) {
+let igualUse = false;
+
+function GroupButton({ operacion, setOperacion, setSolve }) {
+  useEffect(() => {
+    console.log(operacion);
+  }, [operacion]);
+
   const solveOperation = (operacion) => {
     if (operacion.includes("(")) {
       let apertura = operacion.match(/\(/g).length;
@@ -12,27 +18,31 @@ function GroupButton({ operacion, setOperacion, solve, setSolve }) {
         cierre++;
       }
     }
-
     operacion = operacion.replace(/(\d)\(/g, `$1*(`);
     operacion = operacion.replace(/\)(\d)/g, `)*$1`);
     operacion = operacion.replace(/\b0+(\d+)/g, `$1`);
 
-    const newSolve = new Function(`return ${operacion}`);
-
-    return newSolve();
+    return eval(operacion);
   };
 
   const handleClickNumber = (value) => {
-    if (operacion === "0") {
+    if (operacion === "0" || igualUse === true) {
       setOperacion(value);
       setSolve(value);
     } else {
       setOperacion(operacion + value);
       setSolve(solveOperation(operacion + value));
     }
+
+    value === "0" &&
+      /\d.?[+\-*/()]0$/.test(operacion) &&
+      setOperacion(operacion);
+
+    igualUse = false;
   };
 
   const handleClickOperator = (value) => {
+    igualUse = false;
     if (value === "(") {
       /[0-9+\-*/)(.]$/.test(operacion) && setOperacion(operacion + value);
       counter++;
@@ -45,43 +55,62 @@ function GroupButton({ operacion, setOperacion, solve, setSolve }) {
         setOperacion(operacion);
       }
     } else if ("*/".includes(value)) {
-      console.log(operacion);
       /[0-9.]$/.test(operacion) && setOperacion(operacion + value);
-      /[/*+\-(]$/.test(operacion) && setOperacion(operacion.slice(0, -1) + value);
-      (operacion.at(-2) === value ) && setOperacion(operacion.slice(0, -2) + value);
+      /[/*+\-(]$/.test(operacion) &&
+        setOperacion(operacion.slice(0, -1) + value);
+      (operacion.at(-2) === value || /[+\-*/]-$/.test(operacion)) &&
+        setOperacion(operacion.slice(0, -2) + value);
     } else if ("+-".includes(value)) {
-      console.log(operacion);
-      setOperacion(operacion + value);
+      if (value === "-") {
+        operacion.at(-1) === "-"
+          ? setOperacion(operacion)
+          : setOperacion(operacion + value);
+      } else if (value === "+") {
+        /[+\-*/]-$/.test(operacion)
+          ? setOperacion(operacion.slice(0, -2) + value)
+          : setOperacion(operacion + value);
+      }
+    } else if (value === ".") {
+      /\.\d*?$/.test(operacion)
+        ? setOperacion(operacion)
+        : setOperacion(operacion + value);
     }
   };
 
   const handleClickEqual = () => {
-    let trySolve;
     try {
-      trySolve = solveOperation(operacion);
       setSolve("");
-      setOperacion(String(trySolve));
+      setOperacion(String(solveOperation(operacion)));
+      igualUse = true;
     } catch (error) {
       setSolve("Error de sintaxis");
     }
   };
 
   const clearDisplay = () => {
-    counter = 0;
     setOperacion("0");
     setSolve("");
+    counter = 0;
+    igualUse = false;
   };
 
   const handleClickDelete = () => {
     operacion.at(-1) === "(" && counter--;
     operacion.at(-1) === ")" && counter++;
+    igualUse = false;
+
     setOperacion(operacion.slice(0, -1));
+    try {
+      setSolve(solveOperation(operacion.slice(0, -1)));
+    } catch (error) {
+      setSolve("Error de sintaxis");
+    }
     operacion.length <= 1 && setOperacion("0");
   };
 
   return (
     <div className="group-btn">
-      <Button onClick={clearDisplay} id={"clear"} value={"AC"} />
+      <Button onClick={clearDisplay} id="clear" value={"AC"} />
       <Button
         onClick={() => {
           handleClickOperator("(");
@@ -203,7 +232,7 @@ function GroupButton({ operacion, setOperacion, solve, setSolve }) {
       />
       <Button
         onClick={() => {
-          handleClickDelete("");
+          handleClickDelete();
         }}
         id={"delete"}
         value={"DEL"}

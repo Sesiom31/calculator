@@ -12,10 +12,10 @@ const solveOperation = (operacion)=>{
   operacion = operacion.replace(/\)(\d)/g,`)*$1` ) ;
   operacion = operacion.replace(/\b0+(\d+)/g, `$1`);
 
-  const newSolve= new Function(`return ${operacion}`);
+  const newSolve= eval(operacion);
 
-  return newSolve()  
+  return newSolve  
 }
 
-console.log(typeof solveOperation('45'))
+console.log(typeof solveOperation('5+3'))
 console.log(5*(3+5)*4)
